@@ -14,8 +14,8 @@ BOT_NAME = 'epublibre_crawler'
 SPIDER_MODULES = ['epublibre_crawler.spiders']
 NEWSPIDER_MODULE = 'epublibre_crawler.spiders'
 
-# Maximo una pagina cada minuto
-DOWNLOAD_DELAY = 60
+# Maximo una pagina cada segundo
+DOWNLOAD_DELAY = 1
 
 # Identificate
 USER_AGENT = 'epublibre_crawler (+http://hine.co.cr)'

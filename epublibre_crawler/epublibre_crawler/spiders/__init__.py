@@ -15,6 +15,8 @@ from epublibre_crawler.items import BookItem
 
 class BookSpider(CrawlSpider):
 
+    index = {}
+
     name = "epublibre"
 
     # Dominios en los que el crawler tiene permiso a acceder
@@ -26,20 +28,37 @@ class BookSpider(CrawlSpider):
     # Regla para diferenciar los enlaces de libros y funcion que se les aplica
     rules = [Rule(SgmlLinkExtractor(allow=['/libro/detalle/\d+']), 'parse_book')]
 
-    def parse_book(self, response):
+    def parse_book(self, response, id):
         """ Parser para las pagina de detalle de los libros"""
         filename = response.url.split("/")[-2]
         sel = Selector(response)
-        text = response.body
-        open(filename, 'wb').write(text)
+        
         # Creamos un nuevo libro y asignamos los valores extraidos a
         # los campos correspondientes.
-        book = BookItem()
+        book = {}
         author = sel.xpath("//div[@class='negrita aut_sec']/a/text()").extract()
         title = sel.xpath("//div[@id='titulo_libro']/text()[normalize-space()]").extract()
+        # ver si se puede meter por genero
 
+        # Meter el libro en el índice
         # Con Strip eliminamos tabulaciones y linea nueva.
         book['title']  = title[0].strip("\t\n\r")
         book['author'] = author[0].strip("\t\n\r")
 
-        return book
+        index[id] = book
+
+    def author_search(self, query):
+        postings = []
+        for id in self.index:
+            if self.index['author'] == query:
+                postings.append(id)
+        return postings
+
+    def title_search(self,query):
+        postings = []
+        for id in self.index:
+            if self.index['title'] == query:
+                postings.append(id)
+        return postings
+
+
